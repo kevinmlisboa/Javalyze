@@ -10,9 +10,7 @@ const OperationsArea = () => {
         <CardTitle>Operations Area</CardTitle>
       </CardHeader>
 
-      {/* Ensures CardContent fills all remaining space */}
       <CardContent className="flex flex-col flex-grow justify-between space-y-4">
-        {/* Stack buttons vertically with full width and even spacing */}
         <div className="flex flex-col flex-grow space-y-4">
           <Button className="w-full flex-grow">Lexical</Button>
           <Button className="w-full flex-grow">Syntactical</Button>
@@ -22,7 +20,6 @@ const OperationsArea = () => {
           </Button>
         </div>
 
-        {/* Ensures Callout is placed at the bottom */}
         <div className="mt-4">
           <Callout />
         </div>

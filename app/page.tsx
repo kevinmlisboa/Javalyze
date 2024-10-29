@@ -24,14 +24,11 @@ const Home = () => {
           </CardDescription>
         </CardHeader>
 
-        {/* Container for A and B side-by-side */}
         <CardContent className="flex-grow flex">
-          {/* A: Source Code Area */}
           <div className="flex-1 pr-4">
             <TextArea />
           </div>
 
-          {/* B: Column with FilePicker and OperationsArea */}
           <div className="flex flex-col gap-4 w-[30%]">
             <FilePicker />
             <OperationsArea />
