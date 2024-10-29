@@ -10,7 +10,7 @@ import {
 
 const Home = () => {
   return (
-    <div className="sm:p-6 md:p-8 lg:p-12">
+    <div className="sm:p-6 md:p-8 lg:p-12 ">
       <Card>
         <CardHeader>
           <CardTitle className="sm:text-xl md:text-2xl lg:text-4xl ">
