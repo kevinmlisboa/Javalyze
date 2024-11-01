@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import { useFileContext } from "@/context/FileContext";
 
 export type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
@@ -20,12 +21,18 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, ...props }, ref) => {
     const [showAlert, setShowAlert] = useState(false);
     const [allowFilePick, setAllowFilePick] = useState(false);
+    const { setFile } = useFileContext();
 
     const handleFileClick = (event: React.MouseEvent<HTMLInputElement>) => {
       if (!allowFilePick) {
         event.preventDefault();
         setShowAlert(true);
       }
+    };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const selectedFile = event.target.files ? event.target.files[0] : null;
+      setFile(selectedFile);
     };
 
     useEffect(() => {
@@ -49,6 +56,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
           ref={ref}
           onClick={handleFileClick}
+          onChange={handleFileChange}
           {...props}
         />
 
