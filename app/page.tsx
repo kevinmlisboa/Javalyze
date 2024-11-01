@@ -1,3 +1,5 @@
+"use client";
+
 import FilePicker from "@/components/dashboard/FilePicker";
 import OperationsArea from "@/components/dashboard/OperationsArea";
 import TextArea from "@/components/dashboard/TextArea";
@@ -9,8 +11,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useFileContext } from "@/context/FileContext";
 
 const Home = () => {
+  const { file } = useFileContext();
+  console.log(file);
   return (
     <div className="p-4 sm:p-6 md:p-8 lg:p-12 h-screen flex flex-col">
       <Card className="flex-1 h-full flex flex-col mb-4">

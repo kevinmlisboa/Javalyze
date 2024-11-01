@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Rubik } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { FileContextProvider } from "@/context/FileContext";
 
 const rubik = Rubik({ subsets: ["latin"] });
 
@@ -18,14 +19,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={rubik.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+        <FileContextProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </FileContextProvider>
       </body>
     </html>
   );
