@@ -145,8 +145,8 @@ export class Lexer {
         tokens.push({ value: ";", type: "SEMICOLON" });
       } else {
         tokens.push({ value: this.currentChar, type: "UNKNOWN" });
-        this.advance();
       }
+      this.advance();
     }
 
     return tokens;
