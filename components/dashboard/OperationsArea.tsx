@@ -1,9 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "../ui/button";
 import { useFileContext } from "@/context/FileContext";
-import { Lexer } from "@/pl-methods/lexicalAnalysis";
+import { Lexer, Token } from "@/pl-methods/lexicalAnalysis";
 import { useState } from "react";
 import Callout from "../Callout";
+import { DeclarationPatternAnalyzer } from "@/pl-methods/DeclarationPatternAnalyzer";
 
 const OperationsArea = () => {
   const { file } = useFileContext();
@@ -20,8 +21,14 @@ const OperationsArea = () => {
     }
 
     const text = await file.text();
-    const lexer = new Lexer(text);
-    const tokens = lexer.getTokens();
+    const javaDeclarations = new DeclarationPatternAnalyzer(text);
+    javaDeclarations.analyze();
+    let lexer: Lexer | null = null;
+    const tokens: Token[][] = [];
+    javaDeclarations.getDeclarations().forEach((declarations) => {
+      lexer = new Lexer(declarations);
+      tokens.push(lexer.getTokens());
+    });
 
     // If no tokens, also fail the test
     if (tokens.length === 0) {
@@ -29,7 +36,7 @@ const OperationsArea = () => {
       setCalloutMessage("Lexical analysis failed. No tokens found.");
       return;
     }
-
+    console.log(tokens);
     // Otherwise, pass the test with this callout message
     setLexicalAnalysisPassed(true);
     setCalloutMessage(
