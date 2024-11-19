@@ -1,11 +1,11 @@
-type TokenType =
+export type TokenType =
   | "IDENTIFIER"
   | "ASSIGNMENT"
   | "LITERAL"
   | "SEMICOLON"
   | "UNKNOWN";
 
-type Token = {
+export type Token = {
   type: TokenType;
   value: string;
 };
