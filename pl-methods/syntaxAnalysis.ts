@@ -99,6 +99,7 @@ export class SyntaxAnalyzer {
     message: string
   ): { token: Token | null; message: string } {
     const token = this.tokens[this.current];
+    console.log(`Consuming token:`, token); 
     if (token && token.type === expectedType) {
       this.current++;
       return { token, message: "Success" };
