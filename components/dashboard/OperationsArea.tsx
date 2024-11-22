@@ -30,14 +30,13 @@ const OperationsArea = () => {
     const text = await file.text();
     const analyzer = new DeclarationPatternAnalyzer(text);
     analyzer.analyze();
-    let lexer: Lexer | null = null;
     const tokenSets: Token[][] = [];
 
     // Generate tokens for each declaration pattern found
     analyzer.getDeclarations().forEach((declaration) => {
-      lexer = new Lexer(declaration);
+      const lexer = new Lexer(declaration);
       const tokensForDeclaration = lexer.getTokens();
-      console.log("Tokens for declaration:", tokensForDeclaration); // Debug log
+      console.log("Tokens for declaration:", tokensForDeclaration);
       tokenSets.push(tokensForDeclaration);
     });
 
