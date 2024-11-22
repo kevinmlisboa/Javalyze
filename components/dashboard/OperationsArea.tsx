@@ -14,16 +14,27 @@ const OperationsArea = () => {
     useState(false);
   const [calloutMessage, setCalloutMessage] = useState("");
   const [tokens, setTokens] = useState<Token[][]>([]);
-  const [lastAnalysisStatus, setLastAnalysisStatus] = useState<
+  const [analysisStatus, setAnalysisStatus] = useState<
     "lexical" | "syntactical" | null
   >(null);
 
+  const handleAnalysisStatus = (analysisStatus: string | null) => {
+    switch (analysisStatus) {
+      case "lexical":
+        return lexicalAnalysisPassed;
+      case "syntactical":
+        return syntacticalAnalysisPassed;
+      default:
+        return false;
+    }
+  };
+
   // Guard clause is used for better readability. If no file selected
   const handleLexicalAnalysis = async () => {
+    setAnalysisStatus("lexical");
     if (!file) {
       setLexicalAnalysisPassed(false);
       setCalloutMessage("No file selected. Please upload a file to analyze.");
-      setLastAnalysisStatus("lexical");
       return;
     }
 
@@ -31,6 +42,7 @@ const OperationsArea = () => {
     const analyzer = new DeclarationPatternAnalyzer(text);
     analyzer.analyze();
     const tokenSets: Token[][] = [];
+    console.log(analyzer.getDeclarations());
 
     // Generate tokens for each declaration pattern found
     analyzer.getDeclarations().forEach((declaration) => {
@@ -41,10 +53,9 @@ const OperationsArea = () => {
     });
 
     // Check if no tokens were generated at all
-    if (tokenSets.flat().length === 0) {
+    if (tokenSets.length === 0) {
       setLexicalAnalysisPassed(false);
       setCalloutMessage("Lexical analysis failed. No tokens found.");
-      setLastAnalysisStatus("lexical");
       console.log("Lexical analysis failed: No tokens generated.");
       return;
     }
@@ -55,40 +66,35 @@ const OperationsArea = () => {
     setCalloutMessage(
       "Lexical analysis passed. You can move to the next phase."
     );
-    console.log("Lexical analysis passed:", tokenSets);
-
-    // Reset syntactical state
-    setSyntacticalAnalysisPassed(false);
-    setLastAnalysisStatus("lexical");
   };
 
   const handleSyntacticalAnalysis = () => {
+    setAnalysisStatus("syntactical");
     if (tokens.flat().length === 0) {
       setSyntacticalAnalysisPassed(false);
       setCalloutMessage("Syntactical analysis failed. No tokens available.");
-      setLastAnalysisStatus("syntactical");
+      // setLastAnalysisStatus("syntactical");
       return;
     }
+    tokens.forEach((subtokens) => {
+      const syntaxAnalyzer = new SyntaxAnalyzer(subtokens);
+      const result = syntaxAnalyzer.parse();
 
-    const syntaxAnalyzer = new SyntaxAnalyzer(tokens.flat());
-    const result = syntaxAnalyzer.parse();
-
-    console.log("Syntactical analysis result:", result);
-
-    // Check for errors from the syntactical analysis
-    if (result.errors && result.errors.length > 0) {
-      setSyntacticalAnalysisPassed(false);
-      setCalloutMessage(
-        `Syntactical analysis failed. Errors: ${result.errors.join(", ")}`
-      );
-      setLastAnalysisStatus("syntactical");
-    } else {
-      setSyntacticalAnalysisPassed(true);
-      setCalloutMessage(
-        "Syntactical analysis passed. You can move to the next phase."
-      );
-      setLastAnalysisStatus("syntactical");
-    }
+      // Check for errors from the syntactical analysis
+      if (result.errors && result.errors.length > 0) {
+        setSyntacticalAnalysisPassed(false);
+        setCalloutMessage(
+          `Syntactical analysis failed. Errors: ${result.errors.join(", ")}`
+        );
+        // setLastAnalysisStatus("syntactical");
+      } else {
+        setSyntacticalAnalysisPassed(true);
+        setCalloutMessage(
+          "Syntactical analysis passed. You can move to the next phase."
+        );
+        // setAnalysisStatus("syntactical");
+      }
+    });
   };
 
   return (
@@ -123,11 +129,7 @@ const OperationsArea = () => {
           {calloutMessage && (
             <Callout
               message={calloutMessage}
-              status={
-                lastAnalysisStatus === "lexical"
-                  ? lexicalAnalysisPassed
-                  : syntacticalAnalysisPassed
-              }
+              status={handleAnalysisStatus(analysisStatus)}
             />
           )}
         </div>
