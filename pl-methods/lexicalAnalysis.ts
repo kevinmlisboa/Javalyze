@@ -122,6 +122,7 @@ export class Lexer {
     const tokens: Token[] = [];
 
     while (this.currentChar !== null) {
+      console.log(this.currentChar);
       if (/\s/.test(this.currentChar)) {
         this.skipWhitespace();
       } else if (this.isAlpha(this.currentChar)) {
@@ -141,12 +142,14 @@ export class Lexer {
         tokens.push(this.readCharLiteral());
       } else if (this.currentChar === "=") {
         tokens.push({ value: "=", type: "ASSIGNMENT" });
+        this.advance();
       } else if (this.currentChar === ";") {
         tokens.push({ value: ";", type: "SEMICOLON" });
+        this.advance();
       } else {
         tokens.push({ value: this.currentChar, type: "UNKNOWN" });
+        this.advance();
       }
-      this.advance();
     }
 
     return tokens;
