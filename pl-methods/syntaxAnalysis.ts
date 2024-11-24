@@ -25,7 +25,7 @@ type SyntaxInterpreter = {
   dataType?: string;
   identifier?: string;
   value?: string;
-  errors?: string[]; // List of errors encountered during parsing
+  errors?: string[]; 
 };
 
 export class SyntaxAnalyzer {
