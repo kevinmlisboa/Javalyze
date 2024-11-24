@@ -73,7 +73,6 @@ const OperationsArea = () => {
     if (tokens.flat().length === 0) {
       setSyntacticalAnalysisPassed(false);
       setCalloutMessage("Syntactical analysis failed. No tokens available.");
-      // setLastAnalysisStatus("syntactical");
       return;
     }
     tokens.forEach((subtokens) => {
@@ -86,13 +85,11 @@ const OperationsArea = () => {
         setCalloutMessage(
           `Syntactical analysis failed. Errors: ${result.errors.join(", ")}`
         );
-        // setLastAnalysisStatus("syntactical");
       } else {
         setSyntacticalAnalysisPassed(true);
         setCalloutMessage(
           "Syntactical analysis passed. You can move to the next phase."
         );
-        // setAnalysisStatus("syntactical");
       }
     });
   };
@@ -105,20 +102,29 @@ const OperationsArea = () => {
 
       <CardContent className="flex flex-col flex-grow justify-between space-y-4">
         <div className="flex flex-col flex-grow space-y-4">
-          <Button className="w-full flex-grow" onClick={handleLexicalAnalysis}>
+          <Button
+            className="w-full flex-grow"
+            onClick={handleLexicalAnalysis}
+            disabled={lexicalAnalysisPassed} // Disable after passing lexical analysis
+          >
             Lexical
           </Button>
 
-          {/* Enable the Syntactical button only after Lexical analysis */}
           <Button
             className="w-full flex-grow"
             onClick={handleSyntacticalAnalysis}
-            disabled={!lexicalAnalysisPassed}
+            disabled={!lexicalAnalysisPassed} // Enable only after lexical analysis
           >
             Syntactical
           </Button>
 
-          <Button className="w-full flex-grow">Semantical</Button>
+          <Button
+            className="w-full flex-grow"
+            disabled={!syntacticalAnalysisPassed} // Enable only after syntactical analysis
+          >
+            Semantical
+          </Button>
+
           <Button variant="destructive" className="w-full flex-grow">
             Clear
           </Button>
