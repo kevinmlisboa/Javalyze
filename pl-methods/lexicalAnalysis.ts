@@ -113,6 +113,7 @@ export class Lexer {
     const tokens: Token[] = [];
 
     while (this.currentChar !== null) {
+      console.log(this.currentChar);
       if (/\s/.test(this.currentChar)) {
         this.skipWhitespace();
       } else if (this.isAlpha(this.currentChar)) {
