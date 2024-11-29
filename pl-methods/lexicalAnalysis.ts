@@ -1,14 +1,4 @@
-export type TokenType =
-  | "IDENTIFIER"
-  | "ASSIGNMENT"
-  | "LITERAL"
-  | "SEMICOLON"
-  | "UNKNOWN";
-
-export type Token = {
-  type: TokenType;
-  value: string;
-};
+import { Token } from "./type/Token";
 
 export class Lexer {
   private input: string;
@@ -70,23 +60,23 @@ export class Lexer {
 
   private readStringLiteral(): Token {
     let result = "";
-    this.advance(); 
+    this.advance();
     while (this.currentChar !== null && this.currentChar !== '"') {
       result += this.currentChar;
       this.advance();
     }
-    this.advance(); 
+    this.advance();
     return { value: result, type: "LITERAL" };
   }
 
   private readCharLiteral(): Token {
     let result = "";
-    this.advance(); 
+    this.advance();
     if (this.currentChar !== null && this.currentChar !== "'") {
       result = this.currentChar;
       this.advance();
     }
-    this.advance(); 
+    this.advance();
     return { value: result, type: "LITERAL" };
   }
 

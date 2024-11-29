@@ -1,4 +1,5 @@
-import { Token, TokenType } from "./lexicalAnalysis";
+import { SyntaxInterpreter } from "./type/SyntaxInterpreter";
+import { Token, TokenType } from "./type/Token";
 
 //TODO: get error messages and display in frontend
 //example output
@@ -19,14 +20,6 @@ import { Token, TokenType } from "./lexicalAnalysis";
   "value": "42",
   "errors": []
 }*/
-
-type SyntaxInterpreter = {
-  type: "VariableDeclaration";
-  dataType?: string;
-  identifier?: string;
-  value?: string;
-  errors?: string[]; 
-};
 
 export class SyntaxAnalyzer {
   private tokens: Token[];

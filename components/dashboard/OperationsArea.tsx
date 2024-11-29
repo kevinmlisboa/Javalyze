@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "../ui/button";
 import { useFileContext } from "@/context/FileContext";
-import { Lexer, Token } from "@/pl-methods/lexicalAnalysis";
+import { Lexer } from "@/pl-methods/lexicalAnalysis";
+import { Token } from "@/pl-methods/type/Token";
 import { useState } from "react";
 import Callout from "../Callout";
 import { DeclarationPatternAnalyzer } from "@/pl-methods/DeclarationPatternAnalyzer";
@@ -73,6 +74,7 @@ const OperationsArea = () => {
     if (tokens.flat().length === 0) {
       setSyntacticalAnalysisPassed(false);
       setCalloutMessage("Syntactical analysis failed. No tokens available.");
+      // setLastAnalysisStatus("syntactical");
       return;
     }
     tokens.forEach((subtokens) => {
@@ -85,11 +87,13 @@ const OperationsArea = () => {
         setCalloutMessage(
           `Syntactical analysis failed. Errors: ${result.errors.join(", ")}`
         );
+        // setLastAnalysisStatus("syntactical");
       } else {
         setSyntacticalAnalysisPassed(true);
         setCalloutMessage(
           "Syntactical analysis passed. You can move to the next phase."
         );
+        // setAnalysisStatus("syntactical");
       }
     });
   };
@@ -102,29 +106,20 @@ const OperationsArea = () => {
 
       <CardContent className="flex flex-col flex-grow justify-between space-y-4">
         <div className="flex flex-col flex-grow space-y-4">
-          <Button
-            className="w-full flex-grow"
-            onClick={handleLexicalAnalysis}
-            disabled={lexicalAnalysisPassed} // Disable after passing lexical analysis
-          >
+          <Button className="w-full flex-grow" onClick={handleLexicalAnalysis}>
             Lexical
           </Button>
 
+          {/* Enable the Syntactical button only after Lexical analysis */}
           <Button
             className="w-full flex-grow"
             onClick={handleSyntacticalAnalysis}
-            disabled={!lexicalAnalysisPassed} // Enable only after lexical analysis
+            disabled={!lexicalAnalysisPassed}
           >
             Syntactical
           </Button>
 
-          <Button
-            className="w-full flex-grow"
-            disabled={!syntacticalAnalysisPassed} // Enable only after syntactical analysis
-          >
-            Semantical
-          </Button>
-
+          <Button className="w-full flex-grow">Semantical</Button>
           <Button variant="destructive" className="w-full flex-grow">
             Clear
           </Button>
