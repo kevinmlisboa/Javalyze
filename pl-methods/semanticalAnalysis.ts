@@ -50,13 +50,13 @@ export class SemanticAnalyzer {
   private validateType(dataType: string, value: string): boolean {
     switch (dataType) {
       case "int":
-        return /^\d+$/.test(value); // Integer values
+        return /^-?\d+$/.test(value); // Allow negative integers with optional `-`
       case "String":
         return /^".*"$/.test(value); // String enclosed in quotes
       case "boolean":
         return /^(true|false)$/.test(value); // Boolean values
       case "double":
-        return /^\d+\.\d+$/.test(value); // Floating-point numbers
+        return /^-?\d+(\.\d+)?$/.test(value); // Floating-point numbers, positive or negative
       case "char":
         return /^'.{1}'$/.test(value); // Single character enclosed in single quotes
       default:
