@@ -66,7 +66,7 @@ export class Lexer {
       this.advance();
     }
     this.advance();
-    return { value: result, type: "LITERAL" };
+    return { value: `"${result}"`, type: "LITERAL" };
   }
 
   private readCharLiteral(): Token {
@@ -77,7 +77,7 @@ export class Lexer {
       this.advance();
     }
     this.advance();
-    return { value: result, type: "LITERAL" };
+    return { value: `'${result}'`, type: "LITERAL" };
   }
 
   private readNumberLiteral(): Token {
@@ -103,7 +103,6 @@ export class Lexer {
     const tokens: Token[] = [];
 
     while (this.currentChar !== null) {
-      console.log(this.currentChar);
       if (/\s/.test(this.currentChar)) {
         this.skipWhitespace();
       } else if (this.isAlpha(this.currentChar)) {
