@@ -60,24 +60,27 @@ export class Lexer {
 
   private readStringLiteral(): Token {
     let result = "";
-    this.advance();
+    this.advance(); // Skip the opening double quote
 
     while (this.currentChar !== null) {
-      if (this.currentChar === '"' && result[result.length - 1] !== "\\") {
-        break;
+      if (this.currentChar === '"') {
+        break; // Stop if we reach an unescaped closing quote
       }
-      result += this.currentChar;
-      this.advance();
+
+      result += this.currentChar; // Add the character to the result
+      this.advance(); // Move to the next character
+      console.log(this.currentChar);
     }
 
-    this.advance(); // Skip the closing double-quote
+    this.advance(); // Skip the closing double quote
 
-    const processedString = result.replace(/\\\"/g, '"');
+    const processedString = result.replace(/\\"/g, '"');
+
     return { value: `"${processedString}"`, type: "LITERAL" };
   }
   private readCharLiteral(): Token {
     let result = "";
-    this.advance();
+    this.advance(); // Skip the opening single quote
     if (this.currentChar !== null && this.currentChar !== "'") {
       result = this.currentChar;
       this.advance();
@@ -88,6 +91,12 @@ export class Lexer {
 
   private readNumberLiteral(): Token {
     let result = "";
+    if (this.currentChar === "-") {
+      result += this.currentChar;
+      this.advance();
+    }
+
+    // Process the numeric part
     while (this.currentChar !== null && this.isNumeric(this.currentChar)) {
       result += this.currentChar;
       this.advance();
@@ -104,6 +113,11 @@ export class Lexer {
 
     return { value: result, type: "LITERAL" };
   }
+  private peekNextChar(): string | null {
+    return this.position + 1 < this.input.length
+      ? this.input[this.position + 1]
+      : null;
+  }
 
   public getTokens(): Token[] {
     const tokens: Token[] = [];
@@ -118,6 +132,11 @@ export class Lexer {
         } else {
           tokens.push(this.readIdentifier());
         }
+      } else if (
+        this.currentChar === "-" &&
+        this.isNumeric(this.peekNextChar()!)
+      ) {
+        tokens.push(this.readNumberLiteral());
       } else if (this.isNumeric(this.currentChar)) {
         tokens.push(this.readNumberLiteral());
       } else if (this.currentChar === '"') {

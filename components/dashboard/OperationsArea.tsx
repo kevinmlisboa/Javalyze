@@ -28,6 +28,7 @@ const OperationsArea = () => {
   const [isSyntacticalEnabled, setIsSyntacticalEnabled] = useState(false);
   const [isSemanticalEnabled, setIsSemanticalEnabled] = useState(false);
 
+  console.log(tokens);
   console.log(syntaxTree);
 
   const handleLexicalAnalysis = async () => {
@@ -41,6 +42,7 @@ const OperationsArea = () => {
     const text = await file.text();
     const analyzer = new DeclarationPatternAnalyzer(text);
     analyzer.analyze();
+    console.log("declaration", analyzer.getDeclarations());
     const tokenSets: Token[][] = [];
 
     analyzer.getDeclarations().forEach((declaration) => {
@@ -109,9 +111,9 @@ const OperationsArea = () => {
       semanticAnalyzer.analyze(tree);
     });
     const errors = semanticAnalyzer.getErrors();
+    console.log(errors, "in semantical");
 
     if (errors.length > 0) {
-      console.error("Semantic errors found:", errors);
       setSemanticalAnalysisPassed(false);
       setCalloutMessage("Semantic analysis failed. See console for details.");
     } else {
