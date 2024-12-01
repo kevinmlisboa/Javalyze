@@ -7,17 +7,24 @@ import { useState } from "react";
 import Callout from "../Callout";
 import { DeclarationPatternAnalyzer } from "@/pl-methods/DeclarationPatternAnalyzer";
 import { SyntaxAnalyzer } from "@/pl-methods/syntaxAnalysis";
+import { SyntaxInterpreter } from "@/pl-methods/type/SyntaxInterpreter";
+import { SemanticAnalyzer } from "@/pl-methods/semanticalAnalysis";
+
+type AnalysisStatus = "lexical" | "syntactical" | "semantical" | null;
 
 const OperationsArea = () => {
   const { file } = useFileContext();
   const [lexicalAnalysisPassed, setLexicalAnalysisPassed] = useState(false);
   const [syntacticalAnalysisPassed, setSyntacticalAnalysisPassed] =
     useState(false);
+  const [semanticalAnalysisPassed, setSemanticalAnalysisPassed] =
+    useState(false); // ikaw na dito romnonibba
   const [calloutMessage, setCalloutMessage] = useState("");
   const [tokens, setTokens] = useState<Token[][]>([]);
-  const [analysisStatus, setAnalysisStatus] = useState<
-    "lexical" | "syntactical" | null
-  >(null);
+  const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus>(null);
+  const [syntaxTree, setSyntaxTree] = useState<SyntaxInterpreter[]>([]);
+
+  console.log(syntaxTree);
 
   const handleAnalysisStatus = (analysisStatus: string | null) => {
     switch (analysisStatus) {
@@ -25,6 +32,9 @@ const OperationsArea = () => {
         return lexicalAnalysisPassed;
       case "syntactical":
         return syntacticalAnalysisPassed;
+
+      case "semantical":
+        return semanticalAnalysisPassed;
       default:
         return false;
     }
@@ -43,13 +53,11 @@ const OperationsArea = () => {
     const analyzer = new DeclarationPatternAnalyzer(text);
     analyzer.analyze();
     const tokenSets: Token[][] = [];
-    console.log(analyzer.getDeclarations());
 
     // Generate tokens for each declaration pattern found
     analyzer.getDeclarations().forEach((declaration) => {
       const lexer = new Lexer(declaration);
       const tokensForDeclaration = lexer.getTokens();
-      console.log("Tokens for declaration:", tokensForDeclaration);
       tokenSets.push(tokensForDeclaration);
     });
 
@@ -80,6 +88,7 @@ const OperationsArea = () => {
     tokens.forEach((subtokens) => {
       const syntaxAnalyzer = new SyntaxAnalyzer(subtokens);
       const result = syntaxAnalyzer.parse();
+      setSyntaxTree((prev) => [...prev, result]);
 
       // Check for errors from the syntactical analysis
       if (result.errors && result.errors.length > 0) {
@@ -88,14 +97,27 @@ const OperationsArea = () => {
           `Syntactical analysis failed. Errors: ${result.errors.join(", ")}`
         );
         // setLastAnalysisStatus("syntactical");
-      } else {
-        setSyntacticalAnalysisPassed(true);
-        setCalloutMessage(
-          "Syntactical analysis passed. You can move to the next phase."
-        );
-        // setAnalysisStatus("syntactical");
+        return;
       }
     });
+    setSyntacticalAnalysisPassed(true);
+    setCalloutMessage(
+      "Syntactical analysis passed. You can move to the next phase."
+    );
+  };
+
+  const handleSemanticalAnalysis = () => {
+    setAnalysisStatus("semantical");
+    const semanticAnalyzer = new SemanticAnalyzer();
+    syntaxTree.forEach((tree) => {
+      semanticAnalyzer.analyze(tree);
+    });
+    const errors = semanticAnalyzer.getErrors();
+    if (errors.length > 0) {
+      console.error("Semantic errors found:", errors);
+    } else {
+      console.log("Semantic analysis passed!");
+    }
   };
 
   return (
@@ -119,7 +141,13 @@ const OperationsArea = () => {
             Syntactical
           </Button>
 
-          <Button className="w-full flex-grow">Semantical</Button>
+          <Button
+            className="w-full flex-grow"
+            disabled={!lexicalAnalysisPassed && !semanticalAnalysisPassed}
+            onClick={handleSemanticalAnalysis}
+          >
+            Semantical
+          </Button>
           <Button variant="destructive" className="w-full flex-grow">
             Clear
           </Button>
