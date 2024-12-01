@@ -60,12 +60,12 @@ export class Lexer {
 
   private readStringLiteral(): Token {
     let result = "";
-    this.advance();
+    this.advance(); 
     while (this.currentChar !== null && this.currentChar !== '"') {
       result += this.currentChar;
       this.advance();
     }
-    this.advance();
+    this.advance(); 
     return { value: `"${result}"`, type: "LITERAL" };
   }
 
@@ -76,7 +76,7 @@ export class Lexer {
       result = this.currentChar;
       this.advance();
     }
-    this.advance();
+    this.advance(); 
     return { value: `'${result}'`, type: "LITERAL" };
   }
 
@@ -125,11 +125,13 @@ export class Lexer {
         tokens.push({ value: ";", type: "SEMICOLON" });
         this.advance();
       } else {
+        console.warn(`Unknown character found: ${this.currentChar}`);
         tokens.push({ value: this.currentChar, type: "UNKNOWN" });
         this.advance();
       }
     }
 
+    console.log("Generated tokens:", tokens); // Debugging log
     return tokens;
   }
 }

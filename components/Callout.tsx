@@ -1,7 +1,6 @@
 import { RocketIcon } from "@radix-ui/react-icons";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-// Accepts the status and message from the operations area
 type CalloutProps = {
   message: string;
   status: boolean;
@@ -9,7 +8,7 @@ type CalloutProps = {
 
 const Callout = ({ message, status }: CalloutProps) => {
   return (
-    <Alert className={status ? "bg-green-100" : "bg-red-100"}>
+    <Alert className={status ? "bg-stone-100" : "bg-stone-300"}>
       <RocketIcon className="h-4 w-4" />
       <AlertTitle>{status ? "Test passed!" : "Test failed!"}</AlertTitle>
       <AlertDescription>{message}</AlertDescription>

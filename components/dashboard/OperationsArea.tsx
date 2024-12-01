@@ -13,34 +13,21 @@ import { SemanticAnalyzer } from "@/pl-methods/semanticalAnalysis";
 type AnalysisStatus = "lexical" | "syntactical" | "semantical" | null;
 
 const OperationsArea = () => {
-  const { file } = useFileContext();
+  const { file, clearFile } = useFileContext();
   const [lexicalAnalysisPassed, setLexicalAnalysisPassed] = useState(false);
   const [syntacticalAnalysisPassed, setSyntacticalAnalysisPassed] =
     useState(false);
   const [semanticalAnalysisPassed, setSemanticalAnalysisPassed] =
-    useState(false); // ikaw na dito romnonibba
+    useState(false);
   const [calloutMessage, setCalloutMessage] = useState("");
   const [tokens, setTokens] = useState<Token[][]>([]);
   const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus>(null);
   const [syntaxTree, setSyntaxTree] = useState<SyntaxInterpreter[]>([]);
 
-  console.log(syntaxTree);
+  const [isLexicalEnabled, setIsLexicalEnabled] = useState(true);
+  const [isSyntacticalEnabled, setIsSyntacticalEnabled] = useState(false);
+  const [isSemanticalEnabled, setIsSemanticalEnabled] = useState(false);
 
-  const handleAnalysisStatus = (analysisStatus: string | null) => {
-    switch (analysisStatus) {
-      case "lexical":
-        return lexicalAnalysisPassed;
-      case "syntactical":
-        return syntacticalAnalysisPassed;
-
-      case "semantical":
-        return semanticalAnalysisPassed;
-      default:
-        return false;
-    }
-  };
-
-  // Guard clause is used for better readability. If no file selected
   const handleLexicalAnalysis = async () => {
     setAnalysisStatus("lexical");
     if (!file) {
@@ -54,14 +41,12 @@ const OperationsArea = () => {
     analyzer.analyze();
     const tokenSets: Token[][] = [];
 
-    // Generate tokens for each declaration pattern found
     analyzer.getDeclarations().forEach((declaration) => {
       const lexer = new Lexer(declaration);
       const tokensForDeclaration = lexer.getTokens();
       tokenSets.push(tokensForDeclaration);
     });
 
-    // Check if no tokens were generated at all
     if (tokenSets.length === 0) {
       setLexicalAnalysisPassed(false);
       setCalloutMessage("Lexical analysis failed. No tokens found.");
@@ -69,12 +54,14 @@ const OperationsArea = () => {
       return;
     }
 
-    // If tokens are found, continue
     setTokens(tokenSets);
     setLexicalAnalysisPassed(true);
     setCalloutMessage(
       "Lexical analysis passed. You can move to the next phase."
     );
+
+    setIsLexicalEnabled(false);
+    setIsSyntacticalEnabled(true);
   };
 
   const handleSyntacticalAnalysis = () => {
@@ -82,7 +69,6 @@ const OperationsArea = () => {
     if (tokens.flat().length === 0) {
       setSyntacticalAnalysisPassed(false);
       setCalloutMessage("Syntactical analysis failed. No tokens available.");
-      // setLastAnalysisStatus("syntactical");
       return;
     }
     tokens.forEach((subtokens) => {
@@ -90,13 +76,11 @@ const OperationsArea = () => {
       const result = syntaxAnalyzer.parse();
       setSyntaxTree((prev) => [...prev, result]);
 
-      // Check for errors from the syntactical analysis
       if (result.errors && result.errors.length > 0) {
         setSyntacticalAnalysisPassed(false);
         setCalloutMessage(
           `Syntactical analysis failed. Errors: ${result.errors.join(", ")}`
         );
-        // setLastAnalysisStatus("syntactical");
         return;
       }
     });
@@ -104,6 +88,9 @@ const OperationsArea = () => {
     setCalloutMessage(
       "Syntactical analysis passed. You can move to the next phase."
     );
+
+    setIsSyntacticalEnabled(false);
+    setIsSemanticalEnabled(true);
   };
 
   const handleSemanticalAnalysis = () => {
@@ -113,11 +100,33 @@ const OperationsArea = () => {
       semanticAnalyzer.analyze(tree);
     });
     const errors = semanticAnalyzer.getErrors();
+
     if (errors.length > 0) {
       console.error("Semantic errors found:", errors);
+      setSemanticalAnalysisPassed(false);
+      setCalloutMessage("Semantic analysis failed. See console for details.");
     } else {
       console.log("Semantic analysis passed!");
+      setSemanticalAnalysisPassed(true);
+      setCalloutMessage("Semantic analysis passed.");
     }
+
+    setIsSemanticalEnabled(false);
+  };
+
+  const handleClear = () => {
+    setLexicalAnalysisPassed(false);
+    setSyntacticalAnalysisPassed(false);
+    setSemanticalAnalysisPassed(false);
+    setCalloutMessage("");
+    setTokens([]);
+    setAnalysisStatus(null);
+    setSyntaxTree([]);
+    clearFile();
+
+    setIsLexicalEnabled(true);
+    setIsSyntacticalEnabled(false);
+    setIsSemanticalEnabled(false);
   };
 
   return (
@@ -125,43 +134,48 @@ const OperationsArea = () => {
       <CardHeader>
         <CardTitle>Operations Area</CardTitle>
       </CardHeader>
-
       <CardContent className="flex flex-col flex-grow justify-between space-y-4">
         <div className="flex flex-col flex-grow space-y-4">
-          <Button className="w-full flex-grow" onClick={handleLexicalAnalysis}>
+          <Button
+            className="w-full flex-grow bg-stone-300 text-stone-800 hover:bg-stone-400"
+            onClick={handleLexicalAnalysis}
+            disabled={!isLexicalEnabled}
+          >
             Lexical
           </Button>
-
-          {/* Enable the Syntactical button only after Lexical analysis */}
           <Button
-            className="w-full flex-grow"
+            className="w-full flex-grow bg-stone-300 text-stone-800 hover:bg-stone-400"
             onClick={handleSyntacticalAnalysis}
-            disabled={!lexicalAnalysisPassed}
+            disabled={!isSyntacticalEnabled}
           >
             Syntactical
           </Button>
-
           <Button
-            className="w-full flex-grow"
-            disabled={!lexicalAnalysisPassed && !semanticalAnalysisPassed}
+            className="w-full flex-grow bg-stone-300 text-stone-800 hover:bg-stone-400"
             onClick={handleSemanticalAnalysis}
+            disabled={!isSemanticalEnabled}
           >
             Semantical
           </Button>
-          <Button variant="destructive" className="w-full flex-grow">
+          <Button
+            className="w-full flex-grow bg-stone-700 text-white hover:bg-stone-800"
+            onClick={handleClear}
+          >
             Clear
           </Button>
         </div>
-
-        {/* Dynamically set the callout message */}
-        <div className="mt-4">
-          {calloutMessage && (
-            <Callout
-              message={calloutMessage}
-              status={handleAnalysisStatus(analysisStatus)}
-            />
-          )}
-        </div>
+        {analysisStatus && (
+          <Callout
+            message={calloutMessage}
+            status={
+              analysisStatus === "lexical"
+                ? lexicalAnalysisPassed
+                : analysisStatus === "syntactical"
+                ? syntacticalAnalysisPassed
+                : semanticalAnalysisPassed
+            }
+          />
+        )}
       </CardContent>
     </Card>
   );

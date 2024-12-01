@@ -19,19 +19,3 @@ export class DeclarationPatternAnalyzer {
     }
   }
 }
-
-//example usage
-/* 
-const javaCode = `
-    int x = 10;
-    String name;
-    boolean isReady = true;
-    System.out.println("Hello World!");
-    float height = 5.9;
-`;
-
-const analyzer = new VariableDeclarationAnalyzer(javaCode);
-analyzer.analyze();
-
-console.log(analyzer.getDeclarations()); // Output: ["int x = 10;", "String name;", "boolean isReady = true;", "float height = 5.9;"]
-*/
