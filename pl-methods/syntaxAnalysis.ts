@@ -70,6 +70,14 @@ export class SyntaxAnalyzer {
     const literal = this.parseLiteral();
     if (literal.token?.value) {
       result.value = literal.token.value;
+
+      // Check next token: Only SEMICOLON is allowed here
+      const nextToken = this.tokens[this.current];
+      if (nextToken && nextToken.type !== "SEMICOLON") {
+        this.errors.push(
+          `Unexpected token '${nextToken.value}' after literal.`
+        );
+      }
     } else {
       this.errors.push(literal.message);
     }
@@ -83,7 +91,6 @@ export class SyntaxAnalyzer {
       this.errors.push(semicolon.message);
     }
 
-    // Return the result with errors
     return result;
   }
 

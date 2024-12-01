@@ -28,6 +28,8 @@ const OperationsArea = () => {
   const [isSyntacticalEnabled, setIsSyntacticalEnabled] = useState(false);
   const [isSemanticalEnabled, setIsSemanticalEnabled] = useState(false);
 
+  console.log(syntaxTree);
+
   const handleLexicalAnalysis = async () => {
     setAnalysisStatus("lexical");
     if (!file) {
@@ -71,26 +73,33 @@ const OperationsArea = () => {
       setCalloutMessage("Syntactical analysis failed. No tokens available.");
       return;
     }
+
+    let errors: string[] = [];
+    let hasError = false;
     tokens.forEach((subtokens) => {
       const syntaxAnalyzer = new SyntaxAnalyzer(subtokens);
       const result = syntaxAnalyzer.parse();
       setSyntaxTree((prev) => [...prev, result]);
 
       if (result.errors && result.errors.length > 0) {
-        setSyntacticalAnalysisPassed(false);
-        setCalloutMessage(
-          `Syntactical analysis failed. Errors: ${result.errors.join(", ")}`
-        );
-        return;
+        hasError = true;
+        errors = [...errors, ...result.errors];
       }
     });
-    setSyntacticalAnalysisPassed(true);
-    setCalloutMessage(
-      "Syntactical analysis passed. You can move to the next phase."
-    );
 
-    setIsSyntacticalEnabled(false);
-    setIsSemanticalEnabled(true);
+    if (hasError) {
+      setSyntacticalAnalysisPassed(false);
+      setCalloutMessage(
+        `Syntactical analysis failed. Errors: ${errors.join(", ")}`
+      );
+    } else {
+      setSyntacticalAnalysisPassed(true);
+      setCalloutMessage(
+        "Syntactical analysis passed. You can move to the next phase."
+      );
+      setIsSyntacticalEnabled(false);
+      setIsSemanticalEnabled(true);
+    }
   };
 
   const handleSemanticalAnalysis = () => {

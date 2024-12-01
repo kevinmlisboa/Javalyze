@@ -60,15 +60,21 @@ export class Lexer {
 
   private readStringLiteral(): Token {
     let result = "";
-    this.advance(); 
-    while (this.currentChar !== null && this.currentChar !== '"') {
+    this.advance();
+
+    while (this.currentChar !== null) {
+      if (this.currentChar === '"' && result[result.length - 1] !== "\\") {
+        break;
+      }
       result += this.currentChar;
       this.advance();
     }
-    this.advance(); 
-    return { value: `"${result}"`, type: "LITERAL" };
-  }
 
+    this.advance(); // Skip the closing double-quote
+
+    const processedString = result.replace(/\\\"/g, '"');
+    return { value: `"${processedString}"`, type: "LITERAL" };
+  }
   private readCharLiteral(): Token {
     let result = "";
     this.advance();
@@ -76,7 +82,7 @@ export class Lexer {
       result = this.currentChar;
       this.advance();
     }
-    this.advance(); 
+    this.advance();
     return { value: `'${result}'`, type: "LITERAL" };
   }
 
