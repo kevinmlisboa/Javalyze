@@ -64,20 +64,34 @@ export class Lexer {
 
     while (this.currentChar !== null) {
       if (this.currentChar === '"') {
-        break; // Stop if we reach an unescaped closing quote
+        this.advance(); // Skip the closing double quote
+        break; // Exit the loop
       }
 
-      result += this.currentChar; // Add the character to the result
+      if (this.currentChar === "\\") {
+        this.advance(); // Move to the character following the backslash
+        if (this.currentChar !== null) {
+          // Handle escape sequences like \" or \\
+          result += this.currentChar;
+        } else {
+          // Handle case where backslash is at the end of input
+          result += "\\";
+        }
+      } else {
+        result += this.currentChar; // Add the current character
+      }
+
       this.advance(); // Move to the next character
-      console.log(this.currentChar);
     }
 
-    this.advance(); // Skip the closing double quote
+    // If the loop exits without a closing double quote
+    if (this.currentChar === null) {
+      console.warn(`Unterminated string literal: "${result}"`);
+    }
 
-    const processedString = result.replace(/\\"/g, '"');
-
-    return { value: `"${processedString}"`, type: "LITERAL" };
+    return { value: `"${result}"`, type: "LITERAL" };
   }
+
   private readCharLiteral(): Token {
     let result = "";
     this.advance(); // Skip the opening single quote
