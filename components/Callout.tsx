@@ -8,7 +8,7 @@ type CalloutProps = {
 
 const Callout = ({ message, status }: CalloutProps) => {
   return (
-    <Alert className={status ? "bg-stone-100" : "bg-stone-300"}>
+    <Alert className={status ? "bg-green-100" : "bg-red-100"}>
       <RocketIcon className="h-4 w-4" />
       <AlertTitle>{status ? "Test passed!" : "Test failed!"}</AlertTitle>
       <AlertDescription>{message}</AlertDescription>
