@@ -28,9 +28,6 @@ const OperationsArea = () => {
   const [isSyntacticalEnabled, setIsSyntacticalEnabled] = useState(false);
   const [isSemanticalEnabled, setIsSemanticalEnabled] = useState(false);
 
-  console.log(tokens);
-  console.log(syntaxTree);
-
   const handleLexicalAnalysis = async () => {
     setAnalysisStatus("lexical");
     if (!file) {
@@ -42,7 +39,6 @@ const OperationsArea = () => {
     const text = await file.text();
     const analyzer = new DeclarationPatternAnalyzer(text);
     analyzer.analyze();
-    console.log("declaration", analyzer.getDeclarations());
     const tokenSets: Token[][] = [];
 
     analyzer.getDeclarations().forEach((declaration) => {
@@ -75,33 +71,26 @@ const OperationsArea = () => {
       setCalloutMessage("Syntactical analysis failed. No tokens available.");
       return;
     }
-
-    let errors: string[] = [];
-    let hasError = false;
     tokens.forEach((subtokens) => {
       const syntaxAnalyzer = new SyntaxAnalyzer(subtokens);
       const result = syntaxAnalyzer.parse();
       setSyntaxTree((prev) => [...prev, result]);
 
       if (result.errors && result.errors.length > 0) {
-        hasError = true;
-        errors = [...errors, ...result.errors];
+        setSyntacticalAnalysisPassed(false);
+        setCalloutMessage(
+          `Syntactical analysis failed. Errors: ${result.errors.join(", ")}`
+        );
+        return;
       }
     });
+    setSyntacticalAnalysisPassed(true);
+    setCalloutMessage(
+      "Syntactical analysis passed. You can move to the next phase."
+    );
 
-    if (hasError) {
-      setSyntacticalAnalysisPassed(false);
-      setCalloutMessage(
-        `Syntactical analysis failed. Errors: ${errors.join(", ")}`
-      );
-    } else {
-      setSyntacticalAnalysisPassed(true);
-      setCalloutMessage(
-        "Syntactical analysis passed. You can move to the next phase."
-      );
-      setIsSyntacticalEnabled(false);
-      setIsSemanticalEnabled(true);
-    }
+    setIsSyntacticalEnabled(false);
+    setIsSemanticalEnabled(true);
   };
 
   const handleSemanticalAnalysis = () => {
@@ -111,9 +100,9 @@ const OperationsArea = () => {
       semanticAnalyzer.analyze(tree);
     });
     const errors = semanticAnalyzer.getErrors();
-    console.log(errors, "in semantical");
 
     if (errors.length > 0) {
+      console.error("Semantic errors found:", errors);
       setSemanticalAnalysisPassed(false);
       setCalloutMessage("Semantic analysis failed. See console for details.");
     } else {
@@ -148,28 +137,28 @@ const OperationsArea = () => {
       <CardContent className="flex flex-col flex-grow justify-between space-y-4">
         <div className="flex flex-col flex-grow space-y-4">
           <Button
-            className="w-full flex-grow bg-stone-300 text-stone-800 hover:bg-stone-400"
+            className="w-full flex-grow bg-neutral-900 text-white hover:bg-neutral-700"
             onClick={handleLexicalAnalysis}
             disabled={!isLexicalEnabled}
           >
             Lexical
           </Button>
           <Button
-            className="w-full flex-grow bg-stone-300 text-stone-800 hover:bg-stone-400"
+            className="w-full flex-grow bg-neutral-900 text-white hover:bg-neutral-700"
             onClick={handleSyntacticalAnalysis}
             disabled={!isSyntacticalEnabled}
           >
             Syntactical
           </Button>
           <Button
-            className="w-full flex-grow bg-stone-300 text-stone-800 hover:bg-stone-400"
+            className="w-full flex-grow bg-neutral-900 text-white hover:bg-stone-400"
             onClick={handleSemanticalAnalysis}
             disabled={!isSemanticalEnabled}
           >
             Semantical
           </Button>
           <Button
-            className="w-full flex-grow bg-stone-700 text-white hover:bg-stone-800"
+            className="w-full flex-grow bg-red-600 text-white hover:bg-red-700"
             onClick={handleClear}
           >
             Clear
