@@ -15,7 +15,8 @@ export class DeclarationPatternAnalyzer {
       /\b(int|double|boolean|char|String)\s+\w+\s*=\s*("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')?\s*;\s*/g;
     let match: RegExpExecArray | null;
     while ((match = declarationPattern.exec(this.input)) !== null) {
-      this.declarations.push(match[0]);
+      // Trim the matched declaration to remove any trailing whitespace or newlines
+      this.declarations.push(match[0].trim());
     }
   }
 }
