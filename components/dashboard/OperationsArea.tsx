@@ -78,9 +78,7 @@ const OperationsArea = () => {
 
       if (result.errors && result.errors.length > 0) {
         setSyntacticalAnalysisPassed(false);
-        setCalloutMessage(
-          `Syntactical analysis failed. Errors: ${result.errors.join(", ")}`
-        );
+        setCalloutMessage(`Syntactical analysis failed. ${result.errors[0]}`);
         return;
       }
     });
@@ -102,9 +100,9 @@ const OperationsArea = () => {
     const errors = semanticAnalyzer.getErrors();
 
     if (errors.length > 0) {
-      console.error("Semantic errors found:", errors);
+      // console.error("Semantic errors found:", errors);
       setSemanticalAnalysisPassed(false);
-      setCalloutMessage("Semantic analysis failed. See console for details.");
+      setCalloutMessage(`Semantic analysis failed. ${errors[0].message}`);
     } else {
       console.log("Semantic analysis passed!");
       setSemanticalAnalysisPassed(true);
