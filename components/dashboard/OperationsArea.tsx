@@ -51,7 +51,7 @@ const OperationsArea = () => {
 
     if (tokenSets.length === 0) {
       setLexicalAnalysisPassed(false);
-      setCalloutMessage("Lexical analysis failed. No tokens found.");
+      setCalloutMessage("Lexical analysis failed. Invalid tokens found.");
       console.log("Lexical analysis failed: No tokens generated.");
       return;
     }
@@ -70,7 +70,7 @@ const OperationsArea = () => {
     setAnalysisStatus("syntactical");
     if (tokens.flat().length === 0) {
       setSyntacticalAnalysisPassed(false);
-      setCalloutMessage("Syntactical analysis failed. No tokens available.");
+      setCalloutMessage("Syntactical analysis failed. Invalid sequence of tokens");
       return;
     }
 
