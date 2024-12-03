@@ -6,15 +6,6 @@ type SemanticError = {
   token: Token;
 };
 
-/*
-duplicate like this is not allowed
-int x = 10;
-int x = 30;
-
-int x = "Hello Rom"; will not be accepted
- Expected message: Type mismatch: Cannot assign value '"Hello Rom"' to type 'int'
-*/
-
 export class SemanticAnalyzer {
   private symbolTable: Map<string, string>;
   private errors: SemanticError[];
@@ -27,22 +18,32 @@ export class SemanticAnalyzer {
   analyze(syntaxTree: SyntaxInterpreter): void {
     const { dataType, identifier, value } = syntaxTree;
 
-    // Check for duplicate identifier
-    if (this.symbolTable.has(identifier!)) {
+    // Ensure all required fields are present in the syntax tree
+    if (!dataType || !identifier || value === undefined) {
       this.errors.push({
-        message: `Duplicate declaration of identifier '${identifier}'`,
-        token: { type: "IDENTIFIER", value: identifier! },
+        message: `Incomplete variable declaration: Missing data type, identifier, or value.`,
+        token: {
+          type: "UNKNOWN",
+          value: `${dataType} ${identifier} = ${value}`,
+        },
       });
-    } else {
-      // Add to symbol table
-      this.symbolTable.set(identifier!, dataType!);
+      return;
     }
 
-    // Validate the value based on the data type
-    if (!this.validateType(dataType!, value!)) {
+    if (this.symbolTable.has(identifier)) {
+      this.errors.push({
+        message: `Duplicate declaration of identifier '${identifier}'`,
+        token: { type: "IDENTIFIER", value: identifier },
+      });
+      return;
+    }
+
+    this.symbolTable.set(identifier, dataType);
+
+    if (!this.validateType(dataType, value)) {
       this.errors.push({
         message: `Type mismatch: Cannot assign value '${value}' to type '${dataType}'`,
-        token: { type: "LITERAL", value: value! },
+        token: { type: "LITERAL", value: value },
       });
     }
   }
@@ -50,17 +51,17 @@ export class SemanticAnalyzer {
   private validateType(dataType: string, value: string): boolean {
     switch (dataType) {
       case "int":
-        return /^-?\d+$/.test(value); // Allow negative integers with optional `-`
+        return /^-?\d+$/.test(value); // Integers with optional negative sign
       case "String":
-        return /^".*"$/.test(value); // String enclosed in quotes
+        return /^".*"$/.test(value); // Strings enclosed in double quotes
       case "boolean":
         return /^(true|false)$/.test(value); // Boolean values
       case "double":
-        return /^-?\d+(\.\d+)?$/.test(value); // Floating-point numbers, positive or negative
+        return /^-?\d+(\.\d+)?$/.test(value); // Floating-point numbers
       case "char":
         return /^'.{1}'$/.test(value); // Single character enclosed in single quotes
       default:
-        return false; // Unknown data type
+        return false; // Unsupported data type
     }
   }
 
