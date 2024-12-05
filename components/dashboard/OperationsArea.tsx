@@ -28,8 +28,9 @@ const OperationsArea = () => {
   const [isSyntacticalEnabled, setIsSyntacticalEnabled] = useState(false);
   const [isSemanticalEnabled, setIsSemanticalEnabled] = useState(false);
 
-  console.log("syntaxTree", syntaxTree);
-
+  /* console.log("syntaxTree", syntaxTree);
+  console.log("tokens", tokens);
+ */
   const handleLexicalAnalysis = async () => {
     setAnalysisStatus("lexical");
     if (!file) {
@@ -42,7 +43,6 @@ const OperationsArea = () => {
     const analyzer = new DeclarationPatternAnalyzer(text);
     analyzer.analyze();
     const tokenSets: Token[][] = [];
-
     analyzer.getDeclarations().forEach((declaration) => {
       const lexer = new Lexer(declaration);
       const tokensForDeclaration = lexer.getTokens();
@@ -53,6 +53,7 @@ const OperationsArea = () => {
       setLexicalAnalysisPassed(false);
       setCalloutMessage("Lexical analysis failed. Invalid tokens found.");
       console.log("Lexical analysis failed: No tokens generated.");
+
       return;
     }
 
