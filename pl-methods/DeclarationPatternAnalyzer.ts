@@ -12,7 +12,7 @@ export class DeclarationPatternAnalyzer {
 
   public analyze(): void {
     const declarationPattern =
-      /\b(int|double|boolean|char|String)\s+\w+\s*=\s*("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')?\s*;\s*/g;
+      /\b(int|double|boolean|char|String)\s+\w+\s*=\s*(true|false|[-+]?\d+(\.\d+)?|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')\s*;\s*/g;
     let match: RegExpExecArray | null;
     while ((match = declarationPattern.exec(this.input)) !== null) {
       // Trim the matched declaration to remove any trailing whitespace or newlines
